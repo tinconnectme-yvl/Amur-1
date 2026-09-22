@@ -134,22 +134,20 @@ def get_summary():
 
 @router.get("/pairs")
 def list_pairs():
-    """
-    Returns all 11 observation pairs with their event kind, dates, sensors, and areas.
-    """
     pairs_csv = DATA_DIR / "pairs.csv"
     df = pd.read_csv(pairs_csv)
-    # Replace NaN with None for valid JSON serialization
     df = df.where(pd.notnull(df), None)
+
     records = []
     for _, row in df.iterrows():
-        pid = row["pair_id"]
-        res = pipeline.process_pair(pid)
-        item = row.to_dict()
-        item["stats"] = res["stats"]
+        item = {
+            k: (None if pd.isna(v) else v)
+            for k, v in row.to_dict().items()
+        }
         records.append(item)
-    return {"count": len(records), "pairs": records}
 
+    return {"count": len(records), "pairs": records}
+    
 @router.get("/pairs/{pair_id}")
 def get_pair_details(pair_id: str):
     """
