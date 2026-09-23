@@ -22,9 +22,9 @@ COPY frontend/dist /app/frontend/dist
 COPY run_inference.py /app/run_inference.py
 COPY evaluate_submission.py /app/evaluate_submission.py
 
-EXPOSE 8000
+EXPOSE 10000
 
-HEALTHCHECK --interval=20s --timeout=5s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:8000/api/health || exit 1
+HEALTHCHECK --interval=20s --timeout=5s --start-period=10s --retries=3 \
+    CMD curl -f "http://127.0.0.1:${PORT:-10000}/api/health" || exit 1
 
-CMD ["uvicorn", "backend.app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["sh", "-c", "uvicorn backend.app.main:app --host 0.0.0.0 --port ${PORT:-10000}"]
